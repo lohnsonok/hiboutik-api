@@ -82,7 +82,6 @@ router.post("/", async (req, res) => {
           prices_without_taxes: "0",
           quotation: "0",
           vendor_id: process.env.HIBOUTIK_API_VENDOR_ID,
-          stock_withdrawal: "1",
         });
 
         let config = {
@@ -115,6 +114,7 @@ router.post("/", async (req, res) => {
                 data = qs.stringify({
                   sale_id: response.data.sale_id,
                   product_id: process.env.HIBOUTIK_API_ACOMPTE_PRODUCT_ID,
+                  stock_withdrawal: "1",
                 });
 
                 let config = {
