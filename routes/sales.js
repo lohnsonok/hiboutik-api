@@ -7,7 +7,7 @@ router.post("/", async (req, res) => {
 
     const stripeData = req.body;
 
-    if (stripeData.type !== "checkout.session.completed") {
+    if (stripeData.type !== "payment_intent.succeeded") {
       return res.status(200).json({
         message: "Not a checkout event",
       });
@@ -28,17 +28,22 @@ router.post("/", async (req, res) => {
 
     let customerID = null;
 
+    const stripe = require("stripe")(process.env.STRIPE_API_KEY);
+
+    const customer = await stripe.customers.retrieve(
+      stripeData.data.object.customer
+    );
+
     // find existing user
     axios({
       method: "get",
-      url: `${process.env.HIBOUTIK_API_URL}/customers/search/?email=${stripeData.data.object.customer_details.email}`,
+      url: `${process.env.HIBOUTIK_API_URL}/customers/search/?email=${customer.email}`,
       headers,
       data: {},
     })
       .then(async function (resp) {
         if (resp.data.length === 0) {
-          const userNamesArray =
-            stripeData.data.object.customer_details.name.split(" ");
+          const userNamesArray = customer.name.split(" ");
           const last_name = userNamesArray[userNamesArray.length - 1];
           const first_name = userNamesArray.slice(0, -1).join(" ");
 
@@ -46,12 +51,10 @@ router.post("/", async (req, res) => {
             customers_first_name: first_name,
             customers_last_name: last_name,
             customers_company: "",
-            customers_email: stripeData.data.object.customer_details.email,
-            customers_country:
-              stripeData.data.object.customer_details.address.country,
+            customers_email: customer.email,
+            customers_country: customer.address.country,
             customers_tax_number: "",
-            customers_phone_number:
-              stripeData.data.object.customer_details.phone || "",
+            customers_phone_number: customer.phone || "",
             customers_birth_date: "",
             customers_ref_ext: "",
             customers_misc: "",
