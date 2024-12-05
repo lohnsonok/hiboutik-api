@@ -32,7 +32,7 @@ router.post("/", async (req, res) => {
 
     let customerID = null;
 
-    const stripe = require("stripe")(process.env.STRIPE_LIVE_API_KEY);
+    const stripe = require("stripe")(process.env.STRIPE_API_KEY);
 
     const customer = await stripe.customers.retrieve(
       stripeData.data.object.customer
