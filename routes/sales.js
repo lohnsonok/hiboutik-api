@@ -11,7 +11,7 @@ router.post("/", async (req, res) => {
       return res.status(200).json({
         message: "Not a checkout event",
       });
-    } else if (stripeData?.metadata?.source !== process.env.STRIPE_SOURCE) {
+    } else if (stripeData.data.object.metadata?.source !== process.env.STRIPE_SOURCE) {
       return res.status(200).json({
         message: "Not a valid source",
       });
